@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>O-Learning Path</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <link rel="icon" href="/Images/olearning icon.png">
+  <!-- Import Map for Firebase -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js"
+      }
+    }
+  </script>
+  <!-- Notification styles -->
+  <style>
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #dc3545;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      border: 2px solid white;
+    }
+    
+    .notification-badge.hidden {
+      display: none;
+    }
+    
+    .notification-container {
+      position: relative;
+    }
+    
+    .notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 350px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+    
+    .notification-dropdown.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .forgot-password-link {
+      text-align: right;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+    
+    .forgot-password-link a {
+      color: #007bff;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    
+    .forgot-password-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header">
+      <a href="/html/index.html" class="code-name">O-Learning<span>Path</span></a>
+      
+      <!-- Explore Dropdown -->
+      <div class="explore-container">
+        <button class="explore-btn">
+          Explore <i class="bi bi-chevron-down"></i>
+        </button>
+        <div class="explore-dropdown hidden">
+          <div class="explore-header">
+            <h4>Browse Categories</h4>
+          </div>
+          <div class="explore-categories">
+            <a href="/html/explore.html?category=web" class="explore-item" data-category="web">
+              <i class="bi bi-braces"></i>
+              <span>Web Development</span>
+            </a>
+            <a href="/html/explore.html?category=ml" class="explore-item" data-category="ml">
+              <i class="bi bi-cpu"></i>
+              <span>Machine Learning</span>
+            </a>
+            <a href="/html/explore.html?category=python" class="explore-item" data-category="python">
+              <i class="bi bi-filetype-py"></i>
+              <span>Python Programming</span>
+            </a>
+            <a href="/html/explore.html?category=ai" class="explore-item" data-category="ai">
+              <i class="bi bi-robot"></i>
+              <span>Artificial Intelligence</span>
+            </a>
+            <a href="/html/explore.html?category=uiux" class="explore-item" data-category="uiux">
+              <i class="bi bi-palette"></i>
+              <span>UI / UX Design</span>
+            </a>
+            <a href="/html/explore.html?category=data" class="explore-item" data-category="data">
+              <i class="bi bi-bar-chart"></i>
+              <span>Data Science</span>
+            </a>
+            <a href="/html/explore.html?category=cloud" class="explore-item" data-category="cloud">
+              <i class="bi bi-cloud"></i>
+              <span>Cloud Computing</span>
+            </a>
+            <a href="/html/explore.html?category=security" class="explore-item" data-category="security">
+              <i class="bi bi-shield-lock"></i>
+              <span>Cyber Security</span>
+            </a>
+            <a href="/html/explore.html?category=mobile" class="explore-item" data-category="mobile">
+              <i class="bi bi-phone"></i>
+              <span>Mobile Development</span>
+            </a>
+            <a href="/html/explore.html?category=game" class="explore-item" data-category="game">
+              <i class="bi bi-controller"></i>
+              <span>Game Development</span>
+            </a>
+            <a href="/html/explore.html?category=devops" class="explore-item" data-category="devops">
+              <i class="bi bi-infinity"></i>
+              <span>DevOps</span>
+            </a>
+            <a href="/html/explore.html?category=blockchain" class="explore-item" data-category="blockchain">
+              <i class="bi bi-link"></i>
+              <span>Blockchain</span>
+            </a>
+          </div>
+          <div class="explore-footer">
+            <a href="/html/explore.html" class="view-all-link">View All Courses <i class="bi bi-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="search-container">
+        <div class="search-box">
+          <input type="search" placeholder="Search your course here..." />
+          <a href="#"><i class="bi bi-search"></i></a>
+        </div>
+        <ul id="search-results" class="search-results"></ul>
+      </div>
+    </div>
+
+    <!-- Notification Icon -->
+    <div class="notification-container">
+      <button class="notification-icon" id="notificationBell">
+        <i class="bi bi-bell"></i>
+        <span id="notificationBadge" class="notification-badge hidden">0</span>
+      </button>
+      
+      <!-- Notification Preview Dropdown -->
+      <div class="notification-dropdown hidden" id="notificationDropdown">
+        <div class="notification-header">
+          <h4>Notifications</h4>
+          <button class="mark-all-read" id="markAllRead">Mark all as read</button>
+        </div>
+        <div class="notification-list" id="notificationList">
+          <!-- Notifications will be loaded here -->
+          <div class="notification-empty">No new notifications</div>
+        </div>
+        <div class="notification-footer">
+          <a href="/html/notifications.html">View all notifications</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="links">
+      <button class="sign">Sign In</button>
+      <button class="join">Join Us</button>
+
+      <div class="user-account" style="display:none; position: relative; cursor: pointer; align-items:center; gap:10px;">
+        <img id="user-pic" src="" alt="User Profile" style="width:32px; height:32px; border-radius:50%; object-fit: cover;">
+
+        <div class="user-dropdown hidden" style="position: absolute; top: 45px; right: 0; background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.2); border-radius: 8px; width: 220px; z-index: 10; font-size: 14px;">
+          <div style="padding: 10px; border-bottom: 1px solid #eee;" class="user-drop">
+            <img id="user-drop-pic" src="" alt="User Profile" style="width:32px; height:32px; border-radius:50%; object-fit: cover;">
+            <strong id="dropdown-username"></strong><br>
+          </div>
+          <small id="dropdown-email" style="color: #555;"></small>
+          <div class="userdrop">
+            <a href="/html/settings.html">Settings & Privacy</a>
+            <a href="/html/settings.html#help">Help & Support</a>
+            <a id="logout">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hello Section - Visible only to non-signed-in users -->
+  <section id="hello-section" class="hello-section">
+    <!-- Video Background -->
+    <div class="video-background">
+      <iframe 
+        src="https://player.vimeo.com/video/348556442?autoplay=1&loop=1&autopause=0&muted=1&background=1&controls=0&playsinline=1&byline=0&portrait=0&title=0" 
+        frameborder="0" 
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowfullscreen
+        class="bg-video">
+      </iframe>
+      <div class="video-overlay"></div>
+    </div>
+
+    <div class="hello-container">
+      <div class="hello-content">
+        <h1 class="hello-title">Welcome to <span>O-Learning Path</span></h1>
+        <p class="hello-subtitle">Your journey to mastering development starts here</p>
+        
+        <div class="hello-features">
+          <div class="feature-item">
+            <i class="bi bi-code-slash"></i>
+            <span>Interactive Coding</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-journal-bookmark-fill"></i>
+            <span>300+ Courses</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-award"></i>
+            <span>Free Certificates</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-people-fill"></i>
+            <span>Community Support</span>
+          </div>
+        </div>
+
+        <div class="hello-buttons">
+          <button class="hello-btn primary" onclick="toggleModal('signup')">Get Started Free</button>
+          <button class="hello-btn secondary" onclick="document.querySelector('.trending-skills').scrollIntoView({behavior: 'smooth'})">Explore Courses</button>
+        </div>
+
+        <div class="hello-stats">
+          <div class="stat-item">
+            <span class="stat-number">50K+</span>
+            <span class="stat-label">Active Learners</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100+</span>
+            <span class="stat-label">Expert Mentors</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">95%</span>
+            <span class="stat-label">Success Rate</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Optional floating card instead of second video -->
+      <div class="hello-card">
+        <div class="floating-card">
+          <div class="card-icon">
+            <i class="bi bi-lightbulb"></i>
+          </div>
+          <h3>Start Learning Today</h3>
+          <p>Join thousands of developers who started their journey with us</p>
+          <div class="card-users">
+            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="user">
+            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="user">
+            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="user">
+            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="user">
+            <span>+2K</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wave Divider -->
+    <div class="wave-divider">
+      <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" class="shape-fill"></path>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Sign In Modal -->
+  <div id="signin-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" style="color: #3f3f3f;" onclick="toggleModal(null)">×</button>
+      <h2>Sign In</h2>
+      <div class="password">
+        <input type="email" id="signin-email" placeholder="Email" />
+      </div>
+      <div class="password">
+        <input type="password" id="signin-password" placeholder="Password" />
+        <img src="/Images/eye-close.png" id="icon">
+      </div>
+      
+      <!-- Forgot Password Link -->
+      <div class="forgot-password-link">
+        <a href="#" id="forgot-password">Forgot Password?</a>
+      </div>
+      
+      <button class="sign-button" style="color: #007bff; background-color: #fff; border: 1px solid #0056b3; height: 30px; width: 100px;" onclick="signIn()">Sign In</button>
+      
+      <!-- Google Sign In Button -->
+      <button class="sign-button" style="margin-top: 10px; background: #db4437; color: white; border: none;" onclick="signInWithGoogle()">
+        <i class="bi bi-google"></i> Sign in with Google
+      </button>
+      
+      <!-- Phone Sign In Button -->
+      <button class="sign-button" style="margin-top: 10px; background: #28a745; color: white; border: none;" onclick="toggleModal('phone')">
+        <i class="bi bi-phone"></i> Sign in with Phone
+      </button>
+      
+      <p>
+        Don't have an account?
+        <span class="signup-here" style="cursor:pointer; color:#007bff;">Join Us</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Sign Up Modal - Updated: No name field, only email and password -->
+  <div id="signup-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" style="color: #3f3f3f;" onclick="toggleModal(null)">×</button>
+      <h2>Join Us</h2>
+      <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Create your account. We'll send a verification email to confirm your address.</p>
+      
+      <div class="password">
+        <input type="email" id="signup-email" placeholder="Email" required />
+      </div>
+      <div class="password">
+        <input type="password" id="signup-password" placeholder="Password (min. 6 characters)" required />
+        <img src="/Images/eye-close.png" id="signup-icon" style="cursor: pointer;">
+      </div>
+      
+      <button class="sign-button" style="color: #007bff; background-color: #fff; border: 1px solid #0056b3; height: 30px; width: 100px;" onclick="signUp()">Create Account</button>
+      <p>
+        Already have an account?
+        <span class="signIn-here" style="cursor:pointer; color:#007bff;">Sign In</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Phone Verification Modal -->
+  <div id="phone-verification-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 400px;">
+      <button class="modal-close" onclick="toggleModal(null)">×</button>
+      <h2>Phone Verification</h2>
+      
+      <div id="recaptcha-container"></div>
+      
+      <div id="phone-step-1">
+        <div class="password">
+          <input type="tel" id="phone-number" placeholder="Phone number (e.g., +1234567890)" />
+        </div>
+        <button class="sign-button" style="margin-top: 15px;" onclick="sendPhoneOTP()">Send OTP</button>
+      </div>
+      
+      <div id="phone-step-2" style="display: none;">
+        <div class="password">
+          <input type="text" id="phone-otp" placeholder="Enter OTP" />
+        </div>
+        <button class="sign-button" style="margin-top: 15px;" onclick="verifyPhoneOTPCode()">Verify OTP</button>
+      </div>
+      
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="#" onclick="toggleModal('signin')">Back to Sign In</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Password Reset Modal -->
+  <div id="reset-password-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 400px;">
+      <button class="modal-close" onclick="toggleModal(null)">×</button>
+      <h2>Reset Password</h2>
+      <p style="color: #666; margin-bottom: 20px;">Enter your email address and we'll send you a link to reset your password.</p>
+      
+      <div class="password">
+        <input type="email" id="reset-email" placeholder="Your email address" />
+      </div>
+      
+      <button class="sign-button" style="margin-top: 15px;" onclick="sendPasswordReset()">Send Reset Link</button>
+      
+      <p style="text-align: center; margin-top: 20px;">
+        <a href="#" onclick="toggleModal('signin')">Back to Sign In</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Account Settings Modal -->
+  <div id="account-settings" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" onclick="toggleAccountSettings()">&times;</button>
+      <h2>Account Settings</h2>
+      <form id="account-settings-form">
+        <label>Name:</label>
+        <input type="text" id="update-name" placeholder="Your name" />
+        <label>Profile Image:</label>
+        <input type="file" id="update-image" accept="image/*" />
+        <img id="preview-image" src="" alt="Preview" style="max-width: 100px; margin: 10px 0; display: none;" />
+        <hr />
+        <label>Old Password:</label>
+        <input type="password" id="old-password" placeholder="Old password" required />
+        <label>New Password:</label>
+        <input type="password" id="new-password" placeholder="New password" />
+        <label>Confirm Password:</label>
+        <input type="password" id="confirm-password" placeholder="Confirm new password" />
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="section-wrapper">
+
+    <div class="course-info">
+      
+      <div class="basic-courses-column">
+        <div class="column-header">
+          <h4>Basic Courses</h4>
+        </div>
+        <section class="section" id="basicCoursesList">
+          </section>
+      </div>
+
+      <div class="learning-card">
+
+        <div class="learning-card" id="learningCard">
+          <div class="card-header">
+            <div class="provider-info">
+              <img src="/Images/olearning icon.png" alt="Logo" class="provider-logo">
+              <span>Your Learning Dashboard</span>
+            </div>
+            <button class="share-btn" onclick="shareProgress()"><i class="bi bi-share"></i> Share</button>
+          </div>
+
+          <div class="card-body" id="learningCardBody">
+            
+            <div class="loading-spinner">Loading your courses...</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="section-wrapper">
+    <h3 class="just-for-you-title">Just for you</h3>
+    
+    <div class="duration-filters">
+      <button class="dur-pill active" data-duration="2 hours or less">2 hours or less</button>
+      <button class="dur-pill" data-duration="1-6 Months">1-6 Months</button>
+      <button class="dur-pill" data-duration="Less than a month">Less than a month</button>
+    </div>
+
+    <div class="section-scrolls">
+      <div class="section" id="justForYouContainer">
+        </div>
+    </div>
+
+    <div id="justForYouPagination"></div>
+  </div>
+
+  <div class="trending-skills">
+      <h3>Trending Skills</h3>
+
+      <div class="skills-container" id="skillsContainer">
+          </div>
+      
+      <div id="pagination-container"></div>
+  </div>
+
+
+  <div class="section-wrapper">
+    
+    <div class="section-scroll">
+      <div class="section">
+      </div>
+    </div>
+
+  </div>
+
+  
+
+  <section class="pro-why-us">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="slide-underline">Why O-Learning Path?</h2>
+      </div>
+
+      <div class="why-grid-compact">
+        <div class="compact-card">
+          <div class="icon-circle"><i class="bi bi-award"></i></div>
+          <h4>Expert Mentors</h4>
+          <p>Learn from industry leaders.</p>
+        </div>
+
+        <div class="compact-card">
+          <div class="icon-circle"><i class="bi bi-gift"></i></div>
+          <h4>Zero Cost</h4>
+          <p>100% free high-quality content.</p>
+        </div>
+
+        <div class="compact-card">
+          <div class="icon-circle"><i class="bi bi-patch-check"></i></div>
+          <h4>Certificates</h4>
+          <p>Verify your skills globally.</p>
+        </div>
+
+        <div class="compact-card">
+          <div class="icon-circle"><i class="bi bi-lightning"></i></div>
+          <h4>Fast Track</h4>
+          <p>Accelerated learning paths.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="trusted-section">
+    <h3 class="trusted-title">Who Trusted Us</h3>
+    
+    <div class="logo-slider">
+      <div class="logo-track track-right">
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google"><span>Google</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg" alt="Meta"><span>Meta</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Adobe_Systems_logo_and_wordmark.svg" alt="Adobe"><span>Adobe</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM"><span>IBM</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix"><span>Netflix</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google"><span>Google</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg" alt="Meta"><span>Meta</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Adobe_Systems_logo_and_wordmark.svg" alt="Adobe"><span>Adobe</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM"><span>IBM</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix"><span>Netflix</span></div>
+      </div>
+    </div>
+
+    <div class="logo-slider">
+      <div class="logo-track track-left">
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft"><span>Microsoft</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Stanford_University_logo.svg" alt="Stanford"><span>Stanford</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/University_of_Pennsylvania_shield.svg" alt="UPenn"><span>UPenn</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/University_of_Michigan_logo.svg" alt="Michigan"><span>U-Michigan</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon"><span>Amazon</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft"><span>Microsoft</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/0/07/Stanford_University_logo.svg" alt="Stanford"><span>Stanford</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/University_of_Pennsylvania_shield.svg" alt="UPenn"><span>UPenn</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/University_of_Michigan_logo.svg" alt="Michigan"><span>U-Michigan</span></div>
+        <div class="trust-pill"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon"><span>Amazon</span></div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="edu-footer">
+    <div class="footer-top">
+
+      <div class="footer-col">
+        <h4>O-Learning Path</h4>
+        <a href="#">About</a>
+        <a href="#">What We Offer</a>
+        <a href="#">Leadership</a>
+        <a href="#">Careers</a>
+        <a href="#">Catalog</a>
+        <a href="#">Certificates</a>
+        <a href="#">Degrees</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Community</h4>
+        <a href="#">Learners</a>
+        <a href="#">Partners</a>
+        <a href="/instructor/index.html">Be Our Instructor</a>
+        <a href="#">Beta Testers</a>
+        <a href="#">Blog</a>
+        <a href="#">Podcast</a>
+        <a href="#">Tech Blog</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>More</h4>
+        <a href="#">Press</a>
+        <a href="#">Investors</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+        <a href="#">Help</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Contact</a>
+      </div>
+
+      <div class="footer-col footer-apps">
+        <h4>Mobile App</h4>
+
+        <!-- You can replace src with your own images -->
+        <img src="/Images/appstore.png" alt="App Store">
+        <img src="/Images/googleplay.png" alt="Google Play">
+
+        <div class="certified">
+          <p>Certified</p>
+          <img src="/Images/certified.png" alt="Certified Badge">
+        </div>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 O-Learning Path Inc. All rights reserved.</p>
+
+      <div class="social-icons">
+        <i class="bi bi-facebook"></i>
+        <i class="bi bi-linkedin"></i>
+        <i class="bi bi-twitter-x"></i>
+        <i class="bi bi-youtube"></i>
+        <i class="bi bi-instagram"></i>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/script.js"></script>
+</body>
+</html>

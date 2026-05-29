@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O-LearningPath | Lesson Field</title>
+    <link rel="stylesheet" href="/css/lesson.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        /* Critical styles to ensure display */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            background: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .main-wrapper {
+            margin-left: 80px;
+            margin-top: 70px;
+            padding: 20px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .main-wrapper {
+                margin-left: 0;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-bottom-nav">
+        <button id="mobileVideoBtn" class="nav-btn">
+            <i class="fas fa-play-circle"></i>
+            <span>Video & Info</span>
+        </button>
+        <button id="mobileChatBtn" class="nav-btn">
+            <i class="fas fa-users"></i>
+            <span>Let's Grow</span>
+        </button>
+    </div>
+
+    <aside class="sidebar">
+        <div class="side-top">
+            <a href="/html/index.html" class="logo-circle">O</a>
+        </div>
+        <nav class="side-nav">
+            <div class="nav-icon" id="msgTrigger" title="Message Instructor">
+                <i class="fas fa-comment-alt"></i>
+            </div>
+            <a href="/compiler.html" target="_blank" class="nav-icon" title="Code Compiler">
+                <i class="fas fa-code"></i>
+            </a>
+            <div class="nav-icon active" id="lessonsTrigger" title="Course Lessons">
+                <i class="fas fa-book-open"></i>
+            </div>
+            <div class="nav-icon" id="msgletgrowTrigger" title="New Messages">
+                <i class="fas fa-comment-alt"></i>
+                <span id="msgBadge">0</span>
+            </div>
+        </nav>
+    </aside>
+
+    <div id="lessonSidebar" class="content-panel">
+        <div class="panel-header"></div>
+        <div id="lessonList" class="panel-items"></div>
+    </div>
+
+    <div class="main-wrapper">
+        <header class="top-navbar">
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span>Course Progress</span>
+                    <strong id="progress-text">0%</strong>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progress-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="/html/index.html">Home</a>
+                <span id="current-lesson-title">Loading Lesson...</span>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <section class="video-column">
+                <div class="video-container">
+                    <iframe id="mainVideo" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+                
+                <div class="video-controls">
+                    <button id="prevLessonBtn" class="btn-nav"><i class="fas fa-arrow-left"></i> Previous</button>
+                    <button id="nextLessonBtn" class="btn-next">Next Lesson <i class="fas fa-arrow-right"></i></button>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle box-icon"></i>
+                        <h4>Lesson Overview</h4>
+                        <p id="lessonDesc">Select a lesson to see details.</p>
+                    </div>
+                    <div class="info-box">
+                        <i class="fas fa-download box-icon"></i>
+                        <h4>Resources</h4>
+                        <p>Project files & assets.</p>
+                        <a id="downloadBtn" href="#" target="_blank" class="download-link">Download from Drive</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chat-column" id="chatPanel">
+                <div class="chat-header">
+                    <span>Let's Grow Together</span>
+                    <small>Instructor: Judy Richardson</small>
+                </div>
+                <div id="chatBox" class="chat-messages">
+                    <div class="message-row instructor">
+                        <div class="avatar-container" data-name="Instructor">
+                            <div class="profile-pic teacher-pic"></div>
+                        </div>
+                        <div class="msg-bubble">Hello! How can I help you with this lesson?</div>
+                    </div>
+                </div>
+                <div class="chat-footer">
+                    <input type="text" id="userInput" placeholder="Ask a question...">
+                    <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script type="module" src="/js/lesson.js"></script>
+</body>
+</html>

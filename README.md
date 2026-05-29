@@ -1,2 +1,0 @@
-# iSkilla
-Online Web-Learning
